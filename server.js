@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require ('path');
 const express = require('express');
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -51,6 +53,35 @@ function findById(id, animalsArray) {
   return result;
 }
 
+function createNewAnimal(body, animalsArray) {
+  // main code
+   const animal = body;
+   animalsArray.push(animal);
+  // using sync version of fs.writeFile because it is a small data set
+   fs.writeFileSync(
+     path.join(__dirname, './data/animals.json'),
+    // null means we don't want to modify existing data and 2 creates whitespace for readibility
+     JSON.stringify({ animals: animalsArray }, null, 2) 
+   );
+  // return finish code to post route for response
+  return animal;
+}
+
+function validateAnimal(animal) {
+  if (!animal.name || typeof animal.name !== 'string') {
+    return false;
+  }
+  if (!animal.species || typeof animal.species !== 'string') {
+    return false;
+  }
+  if (!animal.diet || typeof animal.diet !== 'string') {
+    return false;
+  }
+  if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+    return false;
+  }
+}
+
 app.get('/api/animals', (req, res) => {
 	let results = animals;
 	if (req.query) {
@@ -69,9 +100,18 @@ app.get('/api/animals/:id', (req, res) => {
 });
 
 app.post('/api/animals', (req, res) => {
-  // req.body is where icoming content will be
-  console.log(req.body);
-  res.json(req.body);
+  // req.body is where incoming content will be
+  // set id based on what the next index of the array will be
+  req.body.id = animals.length.toString();
+
+  // if any data in req.body is invalid, send 400 back
+  if (!validateAnimal(req.body)) {
+    res.sendStatus(400).send('The animal is not properly formatted');
+  } else {
+  // add animal to json file and animals array in this function
+  const animal = createNewAnimal(req.body, animals);
+  res.json(animal);
+  }
 });
 
 app.listen(PORT, () => {

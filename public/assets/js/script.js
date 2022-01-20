@@ -29,7 +29,8 @@ const handleAnimalFormSubmit = event => {
   fetch('/api/animals', {
     method: 'POST',
     headers: {
-      Accept: 'applications/json'
+      Accept: 'applications/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(animalObject)
   })
@@ -37,7 +38,7 @@ const handleAnimalFormSubmit = event => {
     if (response.ok) {
       return response.json();
     }
-    alert('Error: ' + response.statusText);
+    alert(`Error:  + ${response.statusText}`);
   })
   .then(postResponse => {
     console.log(postResponse);

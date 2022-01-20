@@ -82,6 +82,7 @@ function validateAnimal(animal) {
   if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
     return false;
   }
+  return true
 }
 
 app.get('/api/animals', (req, res) => {
@@ -97,7 +98,7 @@ app.get('/api/animals/:id', (req, res) => {
   if (result) {
     res.json(result);
   } else {
-    res.sendStatus(404);
+    res.send(404);
   }
 });
 
@@ -108,11 +109,11 @@ app.post('/api/animals', (req, res) => {
 
   // if any data in req.body is invalid, send 400 back
   if (!validateAnimal(req.body)) {
-    res.sendStatus(400).send('The animal is not properly formatted');
+   res.status(400).send('The animal is not properly formatted');
   } else {
   // add animal to json file and animals array in this function
-  const animal = createNewAnimal(req.body, animals);
-  res.json(animal);
+    const animal = createNewAnimal(req.body, animals);
+    res.json(animal);
   }
 });
 
